@@ -1,0 +1,323 @@
+layer {
+  name: "data"
+  type: "ImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  image_data_param {
+    source: "./data_valf6.txt"
+    batch_size: 128
+    root_folder: "/mnt/hdd/dataset/audioset/eval_spectrogram_25ms_6frame/"
+  }
+}
+layer {
+  name: "silence_label"
+  type: "Silence"
+  bottom: "label"
+}
+layer {
+  name: "rabel"
+  type: "HDF5Data"
+  top: "rabel"
+  include {
+    phase: TEST
+  }
+  hdf5_data_param {
+    source: "./label_valf6.txt"
+    batch_size: 128
+  }
+}
+layer {
+  name: "conv1a"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1a"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "batn1a"
+  type: "BatchNorm"
+  bottom: "conv1a"
+  top: "batn1a"
+  batch_norm_param {
+    use_global_stats: true
+  }
+}
+layer {
+  name: "scal1a"
+  type: "Scale"
+  bottom: "batn1a"
+  top: "scal1a"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu1a"
+  type: "ReLU"
+  bottom: "scal1a"
+  top: "scal1a"
+}
+layer {
+  name: "conv1b"
+  type: "Convolution"
+  bottom: "scal1a"
+  top: "conv1b"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "batn1b"
+  type: "BatchNorm"
+  bottom: "conv1b"
+  top: "batn1b"
+  batch_norm_param {
+    use_global_stats: true
+  }
+}
+layer {
+  name: "scal1b"
+  type: "Scale"
+  bottom: "batn1b"
+  top: "scal1b"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu1b"
+  type: "ReLU"
+  bottom: "scal1b"
+  top: "scal1b"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "scal1b"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_h: 1
+    kernel_w: 2
+    stride_h: 1
+    stride_w: 2
+  }
+}
+layer {
+  name: "conv2a"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2a"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "batn2a"
+  type: "BatchNorm"
+  bottom: "conv2a"
+  top: "batn2a"
+  batch_norm_param {
+    use_global_stats: true
+  }
+}
+layer {
+  name: "scal2a"
+  type: "Scale"
+  bottom: "batn2a"
+  top: "scal2a"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu2a"
+  type: "ReLU"
+  bottom: "scal2a"
+  top: "scal2a"
+}
+layer {
+  name: "conv2b"
+  type: "Convolution"
+  bottom: "scal2a"
+  top: "conv2b"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 1
+  }
+}
+layer {
+  name: "batn2b"
+  type: "BatchNorm"
+  bottom: "conv2b"
+  top: "batn2b"
+  batch_norm_param {
+    use_global_stats: true
+  }
+}
+layer {
+  name: "scal2b"
+  type: "Scale"
+  bottom: "batn2b"
+  top: "scal2b"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu2b"
+  type: "ReLU"
+  bottom: "scal2b"
+  top: "scal2b"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "scal2b"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "fc5"
+  type: "InnerProduct"
+  bottom: "pool2"
+  top: "fc5"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 1024
+  }
+}
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "fc5"
+  top: "fc5"
+}
+layer {
+  name: "fc55"
+  type: "InnerProduct"
+  bottom: "fc5"
+  top: "fc55"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 1024
+  }
+}
+layer {
+  name: "relu33"
+  type: "ReLU"
+  bottom: "fc55"
+  top: "fc55"
+}
+layer {
+  name: "fc6"
+  type: "InnerProduct"
+  bottom: "fc55"
+  top: "fc6"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  inner_product_param {
+    num_output: 527
+  }
+}
+layer {
+  name: "score"
+  type: "Softmax"
+  bottom: "fc6"
+  top: "score"
+}
+layer {
+  name: "logp"
+  type: "Log"
+  bottom: "score"
+  top: "logp"
+}
+layer {
+  name: "ylogp"
+  type: "Eltwise"
+  bottom: "logp"
+  bottom: "rabel"
+  top: "ylogp"
+  eltwise_param {
+    operation: PROD
+  }
+}
+layer {
+  name: "loss"
+  type: "Reduction"
+  bottom: "ylogp"
+  top: "loss"
+  loss_weight: 1.0
+  reduction_param {
+    operation: ASUM
+    axis: 0
+  }
+}
